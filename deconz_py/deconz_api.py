@@ -62,7 +62,7 @@ class DeCONZApi:
         """Retrieve all available devices in this category."""
         if category in self._device_list:
             return self._device_list[category]
-        else
+        else:
             raise AttributeError('Category not supported')
 
     @asyncio.coroutine
