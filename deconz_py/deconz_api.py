@@ -26,23 +26,23 @@ class DeCONZApi:
     @asyncio.coroutine
     def load(self):
         """Retrieve all available sensors."""
-        data = yield from self.get_data('')
+        async_data = yield from self.get_data('')
 
-        for dcz_id, data in data['sensors'].items():
+        for dcz_id, data in async_data['sensors'].items():
             sensor = DeCONZSensor(dcz_id,
                                   name=data['name'],
                                   device_type=data['type'])
-            sensor.update(data)
+            yield from sensor.update(data)
             self._add_device('sensors', dcz_id, sensor)
 
-        for dcz_id, data in data['lights'].items():
+        for dcz_id, data in async_data['lights'].items():
             light = DeCONZLight(dcz_id,
                                 name=data['name'],
                                 device_type=data['type'],
                                 state=data['state'],
                                 api=self)
             self._add_device('lights', dcz_id, light)
-        for dcz_id, data in data['groups'].items():
+        for dcz_id, data in async_data['groups'].items():
             group = DeCONZLight(dcz_id,
                                 name=data['name'],
                                 device_type=data['type'],
@@ -50,7 +50,7 @@ class DeCONZApi:
                                 api=self)
             self._add_device('groups', dcz_id, group)
 
-        self._ws_port = data['config']['websocketport']
+        self._ws_port = async_data['config']['websocketport']
         try:
             from asyncio import ensure_future
         except ImportError:
@@ -86,11 +86,10 @@ class DeCONZApi:
     def _async_process_message(self, message):
         _LOGGER.debug(message)
 
-        devices = self._device_list.get(message['r']).get(message['id'], None)
+        device = self._device_list.get(message['r']).get(message['id'], None)
 
-        if message['e'] == 'changed' and devices:
-            for device in devices:
-                yield from device.update(message)
+        if message['e'] == 'changed' and device:
+            yield from device.update(message)
         #elif message['e'] == 'added':
         #elif message['e'] == 'deleted' and devices:
         else:
