@@ -21,13 +21,13 @@ class DeCONZApi:
         self._api_key = api_key
         self._ws_port = 0
         self._ws = None
+        self._ws_task = None
         self._device_list = {'sensors':{}, 'lights':{}, 'groups':{}}
 
     def load(self):
         """Retrieve all available sensors."""
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.async_load())
-        loop.close()
 
     @asyncio.coroutine
     def async_load(self):
@@ -63,6 +63,22 @@ class DeCONZApi:
             from asyncio import async as ensure_future
 
         ensure_future(self._ws_listen(self._async_process_message))
+
+    def stop(self):
+        """Stop the websocket listener and clear devices."""
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.async_stop())
+        loop.close()
+
+    @asyncio.coroutine
+    def async_stop(self):
+        """Stop the websocket listener and clear devices."""
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
+        if self._ws:
+            self._ws_close()
+        if self._device_list:
+            del self._device_list
 
     def get_devices(self, category):
         """Retrieve all available devices in this category."""
@@ -211,12 +227,7 @@ class DeCONZApi:
             _LOGGER.debug("Data from websocket: %s", result)
         except Exception as ws_exc:    # pylint: disable=broad-except
             _LOGGER.error("Failed to read from websocket: %s", ws_exc)
-            try:
-                yield from self._ws.close()
-            except Exception as ws_exc2:    # pylint: disable=broad-except
-                _LOGGER.error("Exception during websocket close: %s", ws_exc2)
-            finally:
-                self._ws = None
+            yield from self._ws_close()
 
         return result
 
@@ -236,10 +247,14 @@ class DeCONZApi:
                     yield from asyncio.sleep(30)
 
         finally:
-            try:
-                if self._ws:
-                    yield from self._ws.close()
-            except Exception as ws_exc:    # pylint: disable=broad-except
-                _LOGGER.error("Exception during websocket close: %s", ws_exc)
-            finally:
-                self._ws = None
+            yield from self._ws_close()
+
+    @asyncio.coroutine
+    def _ws_close(self):
+        try:
+            if self._ws:
+                yield from self._ws.close()
+        except Exception as ws_exc:    # pylint: disable=broad-except
+            _LOGGER.error("Exception during websocket close: %s", ws_exc)
+        finally:
+            self._ws = None
