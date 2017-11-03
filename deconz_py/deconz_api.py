@@ -23,8 +23,14 @@ class DeCONZApi:
         self._ws = None
         self._device_list = {'sensors':{}, 'lights':{}, 'groups':{}}
 
-    @asyncio.coroutine
     def load(self):
+        """Retrieve all available sensors."""
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.async_load())
+        loop.close()
+
+    @asyncio.coroutine
+    def async_load(self):
         """Retrieve all available sensors."""
         async_data = yield from self.get_data('')
 
@@ -33,7 +39,7 @@ class DeCONZApi:
                                   name=data['name'],
                                   device_type=data['type'])
             yield from sensor.update(data)
-            self._add_device('sensors', dcz_id, sensor)
+            yield from self._add_device('sensors', dcz_id, sensor)
 
         for dcz_id, data in async_data['lights'].items():
             light = DeCONZLight(dcz_id,
@@ -41,14 +47,14 @@ class DeCONZApi:
                                 device_type=data['type'],
                                 state=data['state'],
                                 api=self)
-            self._add_device('lights', dcz_id, light)
+            yield from self._add_device('lights', dcz_id, light)
         for dcz_id, data in async_data['groups'].items():
             group = DeCONZLight(dcz_id,
                                 name=data['name'],
                                 device_type=data['type'],
                                 state=data['state'],
                                 api=self)
-            self._add_device('groups', dcz_id, group)
+            yield from self._add_device('groups', dcz_id, group)
 
         self._ws_port = async_data['config']['websocketport']
         try:
@@ -79,6 +85,7 @@ class DeCONZApi:
 
         return data
 
+    @asyncio.coroutine
     def _add_device(self, category, dcz_id, device):
         self._device_list[category][dcz_id] = device
 
@@ -206,6 +213,8 @@ class DeCONZApi:
             _LOGGER.error("Failed to read from websocket: %s", ws_exc)
             try:
                 yield from self._ws.close()
+            except Exception as ws_exc2:    # pylint: disable=broad-except
+                _LOGGER.error("Exception during websocket close: %s", ws_exc2)
             finally:
                 self._ws = None
 
@@ -226,7 +235,11 @@ class DeCONZApi:
                     _LOGGER.info("Trying again in 30 seconds.")
                     yield from asyncio.sleep(30)
 
-
         finally:
-            if self._ws:
-                yield from self._ws.close()
+            try:
+                if self._ws:
+                    yield from self._ws.close()
+            except Exception as ws_exc:    # pylint: disable=broad-except
+                _LOGGER.error("Exception during websocket close: %s", ws_exc)
+            finally:
+                self._ws = None
