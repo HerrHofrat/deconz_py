@@ -6,11 +6,18 @@ class DeCONZSensor:
     """Represents a sensor based on an DeConz Sensor."""
 
     ZHATEMPERATURE = 'ZHATemperature'
+    ZHAHUMIDITY = 'ZHAHumidity' #assumed, not yet tested
     ZHALIGHTLEVEL = 'ZHALightLevel'
     ZHASWITCH = 'ZHASwitch'
     ZHAPRESENCE = 'ZHAPresence'
     ZHAOPENCLOSE = 'ZHAOpenClose'
     CLIPSWITCH = 'CLIPSwitch'
+    CLIPOPENCLOSE = 'CLIPOpenClose'
+    CLIPPRESENCE = 'CLIPPresence'
+    CLIPTEMPERATURE = 'CLIPTemperature'
+    CLIPHUMIDITY = 'CLIPHumidity'
+    CLIPGENERICFLAG = 'CLIPGenericFlag'
+    CLIPGENERICSTATUS = 'CLIPGenericStatus'
 
     def __init__(self, dcz_id, name, device_type):
         """Initialize the sensor device."""
@@ -28,18 +35,27 @@ class DeCONZSensor:
         """Update the state of the device."""
         if 'state' in data:
             self._state = data['state']
-            if self._device_type == self.ZHATEMPERATURE:
+            if self._device_type == self.ZHATEMPERATURE or \
+               self._device_type == self.CLIPTEMPERATURE:
                 current_state = self._state['temperature']/float(100)
+            elif self._device_type == self.ZHAHUMIDITY or \
+                 self._device_type == self.CLIPHUMIDITY:
+                current_state = self._state['humidity']/float(100)
             elif self._device_type == self.ZHALIGHTLEVEL:
                 current_state = round(10 ** (float(self._state['lightlevel'] - 1) / 10000), 1)
-            elif self._device_type == self.ZHASWITCH:
+            elif self._device_type == self.ZHASWITCH or \
+                 self._device_type == self.CLIPSWITCH:
                 current_state = self._state['buttonevent']
-            elif self._device_type == self.ZHAPRESENCE:
+            elif self._device_type == self.ZHAPRESENCE or \
+                 self._device_type == self.CLIPPRESENCE:
                 current_state = self._state['presence']
-            elif self._device_type == self.ZHAOPENCLOSE:
+            elif self._device_type == self.ZHAOPENCLOSE or \
+                 self._device_type == self.CLIPOPENCLOSE:
                 current_state = self._state['open']
-            else:
-                return
+            elif self._device_type == self.CLIPGENERICFLAG:
+                current_state = self._state['flag']
+            elif self._device_type == self.CLIPGENERICSTATUS:
+                current_state = self._state['status']
 
             self._current_state = current_state
         if 'config' in data:
