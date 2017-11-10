@@ -6,7 +6,8 @@ class DeCONZSensor:
     """Represents a sensor based on an DeConz Sensor."""
 
     ZHATEMPERATURE = 'ZHATemperature'
-    ZHAHUMIDITY = 'ZHAHumidity' #assumed, not yet tested
+    ZHAHUMIDITY = 'ZHAHumidity'
+    ZHAPRESSURE = 'ZHAPressure'
     ZHALIGHTLEVEL = 'ZHALightLevel'
     ZHASWITCH = 'ZHASwitch'
     ZHAPRESENCE = 'ZHAPresence'
@@ -41,6 +42,8 @@ class DeCONZSensor:
             elif self._device_type == self.ZHAHUMIDITY or \
                  self._device_type == self.CLIPHUMIDITY:
                 current_state = self._state['humidity']/float(100)
+            elif self._device_type == self.ZHAPRESSURE:
+                current_state = self._state['pressure']
             elif self._device_type == self.ZHALIGHTLEVEL:
                 current_state = round(10 ** (float(self._state['lightlevel'] - 1) / 10000), 1)
             elif self._device_type == self.ZHASWITCH or \
