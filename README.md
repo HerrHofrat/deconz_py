@@ -9,9 +9,10 @@ pip3 install deconz_py
 ```
 
 ### History
-|Version|Comment|
-|1.0.0.dev2| Pressure sensor added - thx @tseel|
-|1.0.0.dev1| First version - sensors tested|
+| Version | Comment |
+|---------|---------|
+| 1.0.0.dev2 | Pressure sensor added - thx [tseel](https://github.com/tseel) |
+| 1.0.0.dev1 | First version - sensors tested |
 
 ### Examples
 ```
@@ -27,5 +28,4 @@ pip3 install deconz_py
 Contributions and Pull Requests always welcome.
 
 ### Contributors
-@tseel
-
+[tseel](https://github.com/tseel)
