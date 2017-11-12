@@ -8,6 +8,11 @@ Work in progress
 pip3 install deconz_py
 ```
 
+### History
+|Version|Comment|
+|1.0.0.dev2| Pressure sensor added - thx @tseel|
+|1.0.0.dev1| First version - sensors tested|
+
 ### Examples
 ```
 >>> from deconz_py import DeCONZApi
@@ -20,4 +25,7 @@ pip3 install deconz_py
 
 ### TODO/Contribute
 Contributions and Pull Requests always welcome.
+
+### Contributors
+@tseel
 
