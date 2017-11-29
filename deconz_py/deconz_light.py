@@ -96,13 +96,13 @@ class DeCONZLight:
     def turn_off(self):
         """Instruct the light to turn off."""
         self._current_state = False
-        yield from self._api.set_light(self.is_on, self)
+        yield from self._api.set_light(self)
 
     @asyncio.coroutine
     def turn_on(self):
         """Instruct the light to turn on."""
         self._current_state = True
-        yield from self._api.set_light(self.is_on, self)
+        yield from self._api.set_light(self)
 
     def parse_state(self, state):
 
