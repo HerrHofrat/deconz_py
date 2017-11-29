@@ -120,24 +120,18 @@ class DeCONZApi:
 
     @asyncio.coroutine
     def _set_state(self, light):
-        action_string = None
-        if light.isGroup:
+        if light.is_group:
             resource = 'groups'
             action_string = 'action'
         else:
             resource = 'lights'
             action_string = 'state'
-        url = 'http://{a}:{b}/api/{c}/{d}/{e}/{f}'.format(a=self._host,
-                                                          b=self._port,
-                                                          c=self._api_key,
-                                                          d=resource,
-                                                          e=light.id,
-                                                          f=action_string
-                                                         )
+        url = 'http://{host}:{port}/api/{api_key}/{resource}/{light_id}/{' \
+              'action}'.format(host=self._host, port=self._port,
+                               api_key=self._api_key, resource=resource,
+                               light_id=light.dcz_id, action=action_string)
 
-        data = {}
-        data['on'] = light.is_on
-        data['transitiontime'] = 0
+        data = {'on': light.is_on, 'transitiontime': 0}
 
         if light.is_on: #turn on lights
             data['bri'] = light.brightness
