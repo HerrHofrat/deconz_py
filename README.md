@@ -11,6 +11,7 @@ pip3 install deconz_py
 ### History
 | Version | Comment |
 |---------|---------|
+| 1.0.0.dev3 | Lights fixed - thx [abmantis](https://github.com/abmantis) |
 | 1.0.0.dev2 | Pressure sensor added - thx [tseel](https://github.com/tseel) |
 | 1.0.0.dev1 | First version - sensors tested |
 
@@ -29,3 +30,4 @@ Contributions and Pull Requests always welcome.
 
 ### Contributors
 [tseel](https://github.com/tseel)
+[abmantis](https://github.com/abmantis)
