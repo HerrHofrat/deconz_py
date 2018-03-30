@@ -11,6 +11,7 @@ pip3 install deconz_py
 ### History
 | Version | Comment |
 |---------|---------|
+| 1.0.0.dev5 | Fixed sensor component for not supported sensor types |
 | 1.0.0.dev4 | Fixed sensor when state is not available |
 | 1.0.0.dev3 | Lights fixed - thx [abmantis](https://github.com/abmantis) |
 | 1.0.0.dev2 | Pressure sensor added - thx [tseel](https://github.com/tseel) |
