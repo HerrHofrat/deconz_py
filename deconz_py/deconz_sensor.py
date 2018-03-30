@@ -64,6 +64,9 @@ class DeCONZSensor:
                     current_state = self._state['flag']
                 elif self._device_type == self.CLIPGENERICSTATUS:
                     current_state = self._state['status']
+                else:
+                    _LOGGER.warning(data)
+                    current_state = "unknown"
             except KeyError:
                 current_state = "unknown"
 

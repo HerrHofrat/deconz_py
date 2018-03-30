@@ -3,7 +3,7 @@ setup(
     name='deconz_py',
     packages=['deconz_py'],
     python_requires='>=3.3',
-    version='1.0.0.dev4',
+    version='1.0.0.dev5',
     description='Control deCONZ over the Rest API',
     author='Roman Reibnagel',
     author_email='roman.reibnagel@gmail.com',
