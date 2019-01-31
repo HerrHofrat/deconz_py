@@ -131,15 +131,36 @@ class DeCONZApi:
                                api_key=self._api_key, resource=resource,
                                light_id=light.dcz_id, action=action_string)
 
-        data = {'on': light.is_on, 'transitiontime': 0}
+        data = {'on': light.is_on, 'transitiontime': light.transition_time}
 
         if light.is_on: #turn on lights
-            data['bri'] = light.brightness
-            if light.color_temp is not None:
-                data['ct'] = light.color_temp
-            elif light.xy_color is not None:
-                data['xy'] = light.xy_color
-
+        
+            if light.refresh == 'bri': 
+                data['bri'] = light.brightness
+            elif light.refresh == 'hs': 
+                data['effect'] = 'none'
+                if light.hue is not None:
+                    data['hue'] = light.hue
+                if light.sat is not None:
+                    data['sat'] = light.sat
+            elif light.refresh == 'ct': 
+                if light.color_temp is not None:
+                    data['effect'] = 'none'
+                    data['ct'] = light.color_temp
+            elif light.refresh == 'xy': 
+                if light.xy_color is not None:
+                    data['effect'] = 'none'
+                    data['xy'] = light.xy_color
+            elif light.refresh == 'alert': 
+                if light.alert is not None:
+                    data['effect'] = 'none'
+                    data['alert'] = light.alert
+                    del data['on']
+            elif light.refresh == 'effect': 
+                if light.effect is not None:
+                    data['effect'] = light.effect
+                    data['colorloopspeed'] = light.colorloopspeed
+                   
         json_data = json.dumps(data)
         try:
             session = aiohttp.ClientSession()

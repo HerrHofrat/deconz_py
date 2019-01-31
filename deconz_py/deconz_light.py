@@ -25,7 +25,16 @@ class DeCONZLight:
         self._dimmer = None
         self._ct_color = None
         self._xy_color = None
+        self._hue = None
+        self._sat = None
         self._reachable = False
+        self._transition_time = None
+        self._alert = None
+        self._effect = None
+        self._colorloopspeed = None
+        self._colormode = None
+        
+        self._update = None
 
         self.parse_state(state)
 
@@ -47,6 +56,7 @@ class DeCONZLight:
 
     @xy_color.setter
     def xy_color(self, value):
+        self._update = 'xy'
         self._xy_color = value
 
     @property
@@ -56,7 +66,28 @@ class DeCONZLight:
 
     @color_temp.setter
     def color_temp(self, value):
+        self._update = 'ct'
         self._ct_color = value
+
+    @property
+    def hue(self):
+        """Return the color temperature value."""
+        return self._hue
+
+    @hue.setter
+    def hue(self, value):
+        self._update = 'hs'
+        self._hue = value
+
+    @property
+    def sat(self):
+        """Return the color temperature value."""
+        return self._sat
+
+    @sat.setter
+    def sat(self, value):
+        self._update = 'hs'
+        self._sat = value
 
     @property
     def dcz_id(self):
@@ -75,6 +106,7 @@ class DeCONZLight:
 
     @brightness.setter
     def brightness(self, value):
+        self._update = 'bri'
         self._dimmer = value
 
     @property
@@ -91,6 +123,65 @@ class DeCONZLight:
     def device_type(self):
         """The device type."""
         return self._device_type
+
+    @property
+    def transition_time(self):
+        """Return the color temperature value."""
+        return self._transition_time
+
+    @transition_time.setter
+    def transition_time(self, value):
+        self._transition_time = value
+
+    @property
+    def alert(self):
+        """Return the flash state of the light."""
+        return self._alert
+
+    @alert.setter
+    def alert(self, value):
+        self._update = 'alert'
+        self._alert = value
+
+    @property
+    def effect(self):
+        """Return the flash state of the light."""
+        return self._effect
+
+    @effect.setter
+    def effect(self, value):
+        self._update = 'effect'
+        self._effect = value
+
+    @property
+    def colorloopspeed(self):
+        """Return the flash state of the light."""
+        return self._colorloopspeed
+
+    @colorloopspeed.setter
+    def colorloopspeed(self, value):
+        self._colorloopspeed = value
+
+    @property
+    def colormode(self):
+        """Return the flash state of the light."""
+        return self._colormode
+
+    @colormode.setter
+    def colormode(self, value):
+        self._colormode = value
+
+    @property
+    def refresh(self):
+        """Return the flash state of the light."""
+        return self._update
+     
+    @property
+    def effect_list(self):
+        """Return the list of supported effects."""
+        if self._effect is not None:
+            return ['colorloop']
+        return None
 
     @asyncio.coroutine
     def turn_off(self):
@@ -117,16 +208,18 @@ class DeCONZLight:
             self._ct_color = state['ct']
         if 'xy' in state:
             self._xy_color = state['xy']
-
+        if 'hue' in state:
+            self._hue = state['hue']
+        if 'sat' in state:
+            self._sat = state['sat']
+        if 'alert' in state:
+            self._alert = state['alert']
+        if 'colormode' in state:
+            self._colormode = state['colormode']
+        if 'effect' in state:
+            self._effect = state['effect'] 
         if 'reachable' in state:
             self._reachable = state['reachable']
-
-        # elif 'x' in data:
-        #    color_util.color_xy_brightness_to_RGB(self._xy_color[0], 1, 0)
-        #    self._xy_color = data['x'],self._xy_color[1]
-        # elif 'y' in data:
-        #    color_util.color_xy_brightness_to_RGB(self._xy_color[0], 1, 0)
-        #    self._xy_color = self._xy_color[0],data['y']
 
     def add_update_listener(self, update_listener):
         """update_listener is called as soon as the sensor receives an update"""
