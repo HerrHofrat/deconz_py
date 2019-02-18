@@ -15,8 +15,12 @@ class DeCONZSensor:
     ZHASWITCH = 'ZHASwitch'
     ZHAPRESENCE = 'ZHAPresence'
     ZHAOPENCLOSE = 'ZHAOpenClose'
+    ZHAWATER = 'ZHAWater'
+    ZHAALARM = 'ZHAAlarm'
     CLIPSWITCH = 'CLIPSwitch'
     CLIPOPENCLOSE = 'CLIPOpenClose'
+    CLIPWATER = 'CLIPWater'
+    CLIPALARM = 'CLIPAlarm'
     CLIPPRESENCE = 'CLIPPresence'
     CLIPTEMPERATURE = 'CLIPTemperature'
     CLIPHUMIDITY = 'CLIPHumidity'
@@ -60,6 +64,12 @@ class DeCONZSensor:
                 elif self._device_type == self.ZHAOPENCLOSE or \
                      self._device_type == self.CLIPOPENCLOSE:
                     current_state = self._state['open']
+                elif self._device_type == self.ZHAWATER or \
+                     self._device_type == self.CLIPWATER:
+                    current_state = self._state['water']
+                elif self._device_type == self.ZHAALARM or \
+                     self._device_type == self.CLIPALARM:
+                    current_state = self._state['alarm']
                 elif self._device_type == self.CLIPGENERICFLAG:
                     current_state = self._state['flag']
                 elif self._device_type == self.CLIPGENERICSTATUS:

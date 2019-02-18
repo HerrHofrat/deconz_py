@@ -11,6 +11,7 @@ pip3 install deconz_py
 ### History
 | Version | Comment |
 |---------|---------|
+| 1.0.0.dev7 | Added ZHAWater and ZHAAlarm support |
 | 1.0.0.dev6 | Fixed color light support |
 | 1.0.0.dev5 | Fixed sensor component for not supported sensor types |
 | 1.0.0.dev4 | Fixed sensor when state is not available |
