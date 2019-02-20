@@ -14,12 +14,12 @@ _LOGGER = logging.getLogger(__name__)
 
 class DeCONZApi:
     """Simple binding for the Lundix SPC Web Gateway REST API."""
-    def __init__(self, host, port, api_key):
+    def __init__(self, host, port, ws_port, api_key):
         """Initialize the web gateway client."""
         self._host = host
         self._port = port
         self._api_key = api_key
-        self._ws_port = 0
+        self._ws_port = ws_port
         self._ws = None
         self._ws_task = None
         self._device_list = {'sensors':{}, 'lights':{}, 'groups':{}}
@@ -56,7 +56,7 @@ class DeCONZApi:
                                 api=self)
             yield from self._add_device('groups', dcz_id, group)
 
-        self._ws_port = async_data['config']['websocketport']
+        #self._ws_port = async_data['config']['websocketport']
         try:
             from asyncio import ensure_future
         except ImportError:
