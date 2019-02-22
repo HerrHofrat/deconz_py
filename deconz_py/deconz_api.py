@@ -57,10 +57,10 @@ class DeCONZApi:
             yield from self._add_device('groups', dcz_id, group)
 
         #self._ws_port = async_data['config']['websocketport']
-        try:
-            from asyncio import ensure_future
-        except ImportError:
-            from asyncio import async as ensure_future
+        if hasattr(asyncio, 'ensure_future'):
+           ensure_future = asyncio.ensure_future
+        else:  # use of async keyword has been Deprecated since Python 3.4.4
+           ensure_future =  getattr(asyncio, "async")
 
         ensure_future(self._ws_listen(self._async_process_message))
 

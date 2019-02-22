@@ -11,6 +11,7 @@ pip3 install deconz_py
 ### History
 | Version | Comment |
 |---------|---------|
+| 1.0.0.dev9 | Fix asyncio error for Python 3.7 |
 | 1.0.0.dev8 | Make websocket port configurable |
 | 1.0.0.dev7 | Added ZHAWater and ZHAAlarm support |
 | 1.0.0.dev6 | Fixed color light support |
