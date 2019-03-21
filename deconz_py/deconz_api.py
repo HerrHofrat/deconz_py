@@ -95,11 +95,17 @@ class DeCONZApi:
     @asyncio.coroutine
     def get_data(self, resource):
         """Get data from the gateway"""
-        data = yield from self._call_web_gateway(resource)
-        if not data:
-            return False
+        retry_count = 5
+        while retry_count > 1:
+            data = yield from self._call_web_gateway(resource)
+            if isinstance(data, bool):
+                _LOGGER.debug("Gateway communicat error - retry")
+                sleep(5)
+                retry_count = retry_count - 1
+            else:
+                return data
 
-        return data
+        return False
 
     @asyncio.coroutine
     def _add_device(self, category, dcz_id, device):
