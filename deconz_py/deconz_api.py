@@ -7,6 +7,7 @@ import json
 import aiohttp
 import async_timeout
 
+from tenacity import *
 from .deconz_sensor import DeCONZSensor
 from .deconz_light import DeCONZLight
 
@@ -86,7 +87,7 @@ class DeCONZApi:
             return self._device_list[category]
         else:
             raise AttributeError('Category not supported')
-
+            
     @asyncio.coroutine
     def set_light(self, light):
         """Retrieve all available sensors."""
@@ -95,17 +96,7 @@ class DeCONZApi:
     @asyncio.coroutine
     def get_data(self, resource):
         """Get data from the gateway"""
-        retry_count = 5
-        while retry_count > 1:
-            data = yield from self._call_web_gateway(resource)
-            if isinstance(data, bool):
-                _LOGGER.debug("Gateway communicat error - retry")
-                sleep(5)
-                retry_count = retry_count - 1
-            else:
-                return data
-
-        return False
+        return (yield from self._call_web_gateway(resource))
 
     @asyncio.coroutine
     def _add_device(self, category, dcz_id, device):
@@ -123,7 +114,14 @@ class DeCONZApi:
         #elif message['e'] == 'deleted' and devices:
         else:
             _LOGGER.warning("Unsuccessful websocket message delivered, ignoring: %s", message)
-
+        
+    def is_false(value):
+        """Return True if value is False"""
+        return value is False
+    
+    @retry(stop=stop_after_attempt(5),
+           wait=wait_fixed(3),
+           retry=retry_if_result(is_false))
     @asyncio.coroutine
     def _set_state(self, light):
         if light.is_group:
@@ -192,6 +190,9 @@ class DeCONZApi:
                 yield from response.release()
         return result
 
+    @retry(stop=stop_after_attempt(5),
+           wait=wait_fixed(3),
+           retry=retry_if_result(is_false))
     @asyncio.coroutine
     def _call_web_gateway(self, resource, use_get=True):
         response = None
