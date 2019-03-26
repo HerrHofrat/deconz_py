@@ -34,8 +34,13 @@ class DeCONZSensor:
         self._state = None
         self._config = None
         self._device_type = device_type
-        self._unit_of_measurement = None
         self._current_state = None
+        self._ep = None
+        self._etag = None
+        self._manufacturername = None
+        self._modelid = None
+        self._swversion = None
+        self._uniqueid = None
         self._update_listeners = []
 
     @asyncio.coroutine
@@ -75,7 +80,6 @@ class DeCONZSensor:
                 elif self._device_type == self.CLIPGENERICSTATUS:
                     current_state = self._state['status']
                 else:
-                    _LOGGER.warning(data)
                     current_state = "unknown"
             except KeyError:
                 current_state = "unknown"
@@ -85,6 +89,20 @@ class DeCONZSensor:
             self._config = data['config']
             if 'battery' not in self._config:
                 self._config['battery'] = 'unknown'
+                
+        if 'ep' in data:
+            self._ep = data['ep']
+        if 'etag' in data:
+            self._etag = data['etag']
+        if 'manufacturername' in data:
+            self._manufacturername = data['manufacturername']
+        if 'modelid' in data:
+            self._modelid = data['modelid']
+        if 'swversion' in data:
+            self._swversion = data['swversion']
+        if 'uniqueid' in data:
+            self._uniqueid = data['uniqueid']
+        
         for update_listener in self._update_listeners:
             yield from update_listener(data)
 
@@ -127,20 +145,31 @@ class DeCONZSensor:
         return self._device_type
 
     @property
-    def attributes(self):
-        """Return the device state attributes."""
-        attr = {}
-
-        if self._config:
-            for key, value in self._config.items():
-                attr[key] = value
-
-        if 'battery' not in attr:
-            attr['battery'] = "unkown"
-
-        return attr
+    def ep(self):
+        """The ep of the sensor."""
+        return self._ep
 
     @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement of this entity, if any."""
-        return self._unit_of_measurement
+    def etag(self):
+        """The etag of the sensor."""
+        return self._etag
+
+    @property
+    def manufacturername(self):
+        """The manufacturername of the sensor."""
+        return self._manufacturername
+
+    @property
+    def modelid(self):
+        """The modelid of the sensor."""
+        return self._modelid
+
+    @property
+    def swversion(self):
+        """The swversion of the sensor."""
+        return self._swversion
+
+    @property
+    def uniqueid(self):
+        """The uniqueid of the sensor."""
+        return self._uniqueid
